@@ -4,16 +4,15 @@ package cau.capstone.ottitor.service;
 import cau.capstone.ottitor.dto.RealtimePositionDto;
 import cau.capstone.ottitor.dto.RealtimePositionResponseDto;
 import cau.capstone.ottitor.dto.SubwayInformationDto;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ import java.util.List;
 @Service
 public class SubwayService {
 
-    @Value("${api-key}")
+    @Value("${api.key}")
     private String apiKey;
 
     public Object getRealTimeSubway(String subwayNm, String trainNo) {
@@ -33,13 +32,12 @@ public class SubwayService {
          */
         RestTemplate restTemplate = new RestTemplate();
         RealtimePositionDto realtimePositionDto
-                = restTemplate.exchange(
-                "http://swopenapi.seoul.go.kr/api/subway/" + apiKey + "/json/realtimePosition/0/100/" + subwayNm,
-                HttpMethod.GET,
-                null,
-                RealtimePositionDto.class
+            = restTemplate.exchange(
+            "http://swopenapi.seoul.go.kr/api/subway/" + apiKey + "/json/realtimePosition/0/100/" + subwayNm,
+            HttpMethod.GET,
+            null,
+            RealtimePositionDto.class
         ).getBody();
-
 
         /**
          * RealtimePosition 객체 중 해당하는 열차번호를 가진 열차의 정보를 가져옴.
@@ -64,8 +62,6 @@ public class SubwayService {
 //        List<String> prevStatns = new ArrayList<>();
 //        List<String> nextStatns = new ArrayList<>();
 
-
-
         return null;
     }
 
@@ -75,23 +71,29 @@ public class SubwayService {
     public Object testRealtimePosition(String subwayNm) {
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.exchange(
-                "http://swopenapi.seoul.go.kr/api/subway/" + apiKey + "/json/realtimePosition/0/100/" + subwayNm,
-                HttpMethod.GET,
-                null,
-                RealtimePositionDto.class
+            "http://swopenapi.seoul.go.kr/api/subway/" + apiKey + "/json/realtimePosition/0/100/" + subwayNm,
+            HttpMethod.GET,
+            null,
+            RealtimePositionDto.class
         ).getBody();
     }
 
     /**
      * 호선명으로 지하철역정보 가져오는 테스트
      */
-    public Object testSubwayInfo(String subwayNm) {
+    public SubwayInformationDto testSubwayInfo(String subwayNm) {
         RestTemplate restTemplate = new RestTemplate();
+
+        // 요청 한글 인코딩(5호선)
+        restTemplate.getMessageConverters()
+            .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
         return restTemplate.exchange(
-                "http://openapi.seoul.go.kr:8088/" + apiKey + "/json/SearchSTNBySubwayLineInfo/1/100///" + subwayNm,
-                HttpMethod.GET,
-                null,
-                SubwayInformationDto.class
+            // %20은 공백, 공백없이 슬래시 여러개를 붙이면(///) restTemplate에서 이를 지워버림
+            "http://openapi.seoul.go.kr:8088/" + apiKey + "/json/SearchSTNBySubwayLineInfo/1/100/%20/%20/" + subwayNm,
+            HttpMethod.GET,
+            null,
+            SubwayInformationDto.class
         ).getBody();
     }
 }
