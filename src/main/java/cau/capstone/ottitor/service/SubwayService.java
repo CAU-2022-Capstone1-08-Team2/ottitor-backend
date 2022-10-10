@@ -1,10 +1,13 @@
 package cau.capstone.ottitor.service;
 
 
+import cau.capstone.ottitor.domain.Station;
 import cau.capstone.ottitor.dto.RealtimePositionDto;
 import cau.capstone.ottitor.dto.RealtimePositionResponseDto;
 import cau.capstone.ottitor.dto.SubwayInformationDto;
+import cau.capstone.ottitor.repository.StationRepository;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +25,8 @@ public class SubwayService {
 
     @Value("${api.key}")
     private String apiKey;
+
+    private final StationRepository stationRepository;
 
     public Object getRealTimeSubway(String subwayNm, String trainNo) {
 
@@ -83,6 +88,11 @@ public class SubwayService {
      */
     public SubwayInformationDto testSubwayInfo(String subwayNm) {
         RestTemplate restTemplate = new RestTemplate();
+
+        List<Station> stations = stationRepository.findByLineNumOrderByFrCodeAsc("01호선");
+        stations.forEach(station->{
+            System.out.println(station.getNmKor() + " " + station.getFrCode());
+        });
 
         // 요청 한글 인코딩(5호선)
         restTemplate.getMessageConverters()
