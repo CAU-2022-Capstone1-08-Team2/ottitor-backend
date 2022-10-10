@@ -30,13 +30,17 @@ public class Station extends BaseTimeEntity {
     @Column
     private Integer mnt;
 
+    @Column
+    private Integer directAt;
+
     @Builder
-    public Station(String code, String nmKor, String nmEng, String lineNum, String frCode, Integer mnt) {
+    public Station(String code, String nmKor, String nmEng, String lineNum, String frCode, Integer mnt, Integer directAt) {
         this.code = code;
         this.nmKor = nmKor;
         this.nmEng = nmEng;
         this.lineNum = lineNum;
         this.frCode = frCode;
         this.mnt = mnt;
+        this.directAt = directAt;
     }
 }
