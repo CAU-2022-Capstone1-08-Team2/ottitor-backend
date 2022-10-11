@@ -21,7 +21,8 @@ public class StationService {
 
     private final StationRepository stationRepository;
 
-    private final List<String> lineNumList = List.of("01호선", "02호선", "03호선");
+    private final List<String> lineNumList = List.of("01호선", "02호선", "03호선", "04호선", "05호선", "06호선", "07호선", "08호선",
+        "09호선");
 
     public void initialize() {
         lineNumList.forEach(this::initializeByLineNum);
@@ -43,7 +44,9 @@ public class StationService {
             while ((line = file.readLine()) != null) {
                 line = line.replace("\uFEFF", "");
                 List<String> rows = Arrays.asList(line.split(","));
-                Station station =  Station.builder().code(rows.get(0)).nmKor(rows.get(1)).nmEng(rows.get(2)).lineNum(rows.get(3)).frCode(rows.get(4)).mnt(Integer.parseInt(rows.size() > 5 ? rows.get(5) : "0")).directAt(Integer.parseInt(rows.size() > 6 ? rows.get(6) : "0")).build();
+                Station station = Station.builder().code(rows.get(0)).nmKor(rows.get(1)).nmEng(rows.get(2))
+                    .lineNum(rows.get(3)).frCode(rows.get(4)).mnt(Integer.parseInt(rows.get(5)))
+                    .directAt(Integer.parseInt(rows.get(6))).build();
 
                 stationRepository.save(station);
             }
